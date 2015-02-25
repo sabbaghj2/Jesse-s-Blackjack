@@ -1,54 +1,799 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
+############ If player gets 21, and selects stay, and dealer has way less then 21, his turns are skipped.
 
-# C extensions
-*.so
 
-# Distribution / packaging
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-*.egg-info/
-.installed.cfg
-*.egg
 
-# PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
-*.manifest
-*.spec
 
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
+import random
+from tkinter import *
+from PIL import Image, ImageDraw, ImageTk
+import os
 
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.coverage
-.cache
-nosetests.xml
-coverage.xml
 
-# Translations
-*.mo
-*.pot
+indexLast = 0
 
-# Django stuff:
-*.log
+class card() :
 
-# Sphinx documentation
-docs/_build/
 
-# PyBuilder
-target/
+    def __init__ (self, cardRank, cardSuit, cardValue, cardPic) :
+        self.cardRank = cardRank
+        self.cardSuit = cardSuit
+        self.cardValue = cardValue
+        self.cardPic = cardPic
+
+
+
+class deck() :
+
+    # Global variables in the "deck()" class. These will have the same initial values in each instace of this class.
+    deckObject = []
+    possibleCardRanks = ['ace', 'king', 'queen', 'jack', 10, 9, 8, 7, 6, 5, 4, 3, 2] 
+    possibleCardSuits = ['clubs', 'spades', 'hearts', 'diamonds']      
+    rankIndex = 0
+    suitIndex = 0
+    cardValue = 0
+
+    totalIndex = 1
+    
+    
+    # This method uses two loops to populate the "deckObject" list with card objects.
+    # The "self" object is passed as an argument.
+    def build_the_deck (self) :
+        
+        # This loop goes through the "possibleCardRanks" list and assigns each item to the "cardRank" variable.
+        # It does this intil the number of loop iterations reaches the length of the list.
+        while self.rankIndex < len(self.possibleCardRanks) : 
+
+            cardRank = self.possibleCardRanks[self.rankIndex]
+            self.rankIndex = self.rankIndex + 1
+
+            # The "suitIndex" is set to eacht time zero before the nested loop iterates
+            # becasue the loop will not iterate if "suitIndex" is larger than 4,
+            # and the varaible is incremented in this loop.
+            suitIndex = 0
+
+            # This nested loop goes through the "possibleCardSuits" list.
+            while suitIndex< len(self.possibleCardSuits):
+                cardSuit = self.possibleCardSuits[suitIndex]
+ 
+                # These if statements assign the numerical value to each card object
+                # based on the card's rank.
+                if cardRank == "ace" :
+                    cardValue = 1
+                    
+
+                if cardRank == "jack" or cardRank == "queen" or cardRank == "king" :
+                    cardValue = 10
+                    
+
+
+                if cardRank == 2 :
+                    cardValue = 2
+                    
+
+                if cardRank == 3 :
+                    cardValue = 3
+                    
+                
+                if cardRank == 4 :
+                    cardValue = 4
+                    
+
+                if cardRank == 5 :
+                    cardValue = 5
+                    
+
+                if cardRank == 6 :
+                    cardValue = 6
+                    
+
+                if cardRank == 7 :
+                    cardValue = 7
+                    
+
+                if cardRank == 8 :
+                    cardValue = 8
+                    
+
+                if cardRank == 9 :
+                    cardValue = 9
+                    
+
+                if cardRank == 10 :
+                    cardValue = 10
+
+
+                # Assings a string that corresponds to the name of an image file on my computer.
+                # Each file has a number.
+                cardPic = str(self.totalIndex) + ".png"
+
+                
+                    
+                # This creates a card object "myCard" with new perameters each time the loop iterates.
+                myCard = card(cardRank, cardSuit, cardValue, cardPic)
+                # This adds each new "myCard" the the "deckObject" list.
+                self.deckObject.append(myCard)
+
+                suitIndex = suitIndex +1
+                self.totalIndex = self.totalIndex + 1 
+
+
+
+            
+            
+                
+
+                
+class shuffledDeck() :
+
+
+    newDeck = deck()
+    newDeck.build_the_deck()
+    suffledDeckList = []
+
+
+    def shuffle_the_deck (self) :
+    
+        while len(self.newDeck.deckObject) > 0 :
+
+            ## self.newDeck.deckObject[5].cardRank)
+
+
+            randomCard = random.choice(self.newDeck.deckObject)
+            
+            self.newDeck.deckObject.remove(randomCard)
+            
+            self.suffledDeckList.append(randomCard)
+        
+        
+        ## print("The deck has been shuffled. It has " + str(len(self.suffledDeck)) + " cards.")
+
+
+
+
+
+
+
+class hand () :
+
+
+
+
+
+    # Creates a new "shuffledDeck()" object and calls its "shuffle_the_deck()" method
+    # Thus creates a shuffled deck.
+    # NOTE: these are static global variables. Any instance of this class, or any class that inherits from this class
+    # will get the same instace of these varaibles. In this way, we can be sure that each hand draws from the same instace
+    # of "shuffledDeck()". Any changes made to these varaibles by any instace of this class are reflected in all other instances.
+    # This way, we can be sure that any time anyone draws a card, it is removed from the deck.
+    newShuffledDeck = shuffledDeck()
+    newShuffledDeck.shuffle_the_deck()
+
+    # The "myHand" list object holds all the cards in you hand.
+    # By instatiating the variable "myHand", it is no longer static,
+    # so it can change with each instace of this class. It can still be referanced
+    # throughout the class using the "self" object so that it can behave like a global variable (specific to that istance of the class.
+
+    # NOTE: Here, my hand is instatiated in the constructor, but it is NOT an arguememnt in the "__init__" method.
+    # In this way, "myHand" is created with each new instance of this class, but it doesnt require any arguements,
+    # and it can have different values in each instance. In this sense, this is not a static variable.
+    # Instead, it creates an empty list.
+    def __init__ (self) :
+        self.myHand = []
+ 
+
+
+# This class inherits all the varaibles and methods of the "hand()" class. Varaibles from the "hand()" class can be manipulated
+# in this class in the same way that they could if the varaibles were in this class: using the "self" object.
+class playerHand(hand) :        
+    
+
+    # Picks a new card "newCard" card object from the shuffled deck object "newShuffledDeck"
+    # and removes it from the "shuffledDeck" list in the "newShuffledDeck" object.
+    def pick_a_card (self) :
+
+        newCard = self.newShuffledDeck.suffledDeckList.pop()
+        print("You got a " + str(newCard.cardRank) + " of " + newCard.cardSuit + ".")
+        
+
+        # You can set the value of an ace (1 or 11) upon drawing it. You can also set it when the "show_entire_hand" is called.
+        if newCard.cardValue == 1 :
+            
+            aceInput = input('You got an ace. Enter "soft" to count it as 1, and "hard" to count it as 11. ')
+
+            if aceInput == "soft" :
+                newCard.cardValue = 1
+
+            if aceInput == "hard" :
+                newCard.cardValue = 11
+                
+
+
+        print("Your card's numerical value is " + str(newCard.cardValue) + ".")
+        self.myHand.append(newCard)
+        
+        print("The deck now has " + str(len(self.newShuffledDeck.suffledDeckList)) + " cards in it")
+
+
+        
+    
+
+
+
+
+
+    
+    def show_card_pic (self, picIndex):
+        return self.myHand[picIndex]
+
+    def num_cards (self) :
+        return len(self.myHand)
+    
+
+
+    def ace (self) :
+        return "hi"
+
+
+            
+
+    # Prints the total for the hand.
+    def add_entire_hand (self) :
+
+        handTotal = 0
+        index = 0
+
+        # Cycles through each card in the hand through indexing. The "cardValue" for a given index
+        # is set to the varaible "handTotal", and each time the loop iterates, the new "handTotal" is added
+        # to the previous "handTotal".
+        while index < len(self.myHand) :
+            handTotal = handTotal+ self.myHand[index].cardValue
+            index = index + 1           
+
+        # The "handTotal" is returned so that the int value can be manipulated when this method is called.
+        return handTotal
+    
+    
+
+
+
+# This class inherits all the varaibles and methods of the "hand()" class.
+class dealerHand (hand) :
+
+    def dealer_pick_a_card (self) :
+        
+        newCard = self.newShuffledDeck.suffledDeckList.pop()
+        print("The dealer picked a " + str(newCard.cardRank) + " of " + newCard.cardSuit + ".")
+
+        self.myHand.append(newCard)
+
+
+    def dealer_show_entire_hand (self):
+
+        # To initialize Tkinter, we have to create a Tk root widget       
+        root = Tk()
+        w = Label(root, text="Here's the dealer's hand:")
+        w.pack(side = "top", fill = "both", expand = "yes")
+
+        listOfPics = []
+        index = 0
+        while index < len(self.myHand) :
+            print(str(self.myHand[index].cardRank) + " of " + self.myHand[index].cardSuit + " with a value of "+ str(self.myHand[index].cardValue))
+
+
+            # Creates image objects and adds them to the list "listOfPics".
+            savedPath = os.getcwd()
+            os.chdir("/Users/Jesse/Documents/Python/classic-cards")
+
+            # Creates an image object "img" using PIL.
+            img = Image.open(self.myHand[index].cardPic)
+            # Resizes imgage "img" and creates a new image object "imgResize" with the new size.
+            imgResize = img.resize((225, 300), Image.ANTIALIAS)
+            # Opens the image "imgResize" with the tkinter.PhotoImage class() and creates a ImageTk object "img1".
+            img1 = ImageTk.PhotoImage(imgResize)
+
+            listOfPics.append(img1)
+
+            index = index + 1
+
+
+        
+
+        savedPath = os.getcwd()
+        os.chdir("/Users/Jesse/Documents/Python/classic-cards")
+
+        # Creates an image object "img" using PIL.
+        img = Image.open("b1fv.png")
+        # Resizes imgage "img" and creates a new image object "imgResize" with the new size.
+        imgResize = img.resize((225, 300), Image.ANTIALIAS)
+        # Opens the image "imgResize" with the tkinter.PhotoImage class() and creates a ImageTk object "img1".
+        cardBack = ImageTk.PhotoImage(imgResize)
+        
+        panelForCardBack = Label(root, image = str(cardBack))
+        panelForCardBack.pack(side = "left", fill = "both", expand = "yes")
+
+
+        index = 1                                      
+        # Cycles through the list of image objects "listOfPics".
+        while index < len(listOfPics) :
+
+            # Creates a display panel for each image object in the "listOfPics" list.
+            panel = Label(root, image = str(listOfPics[index]))
+
+            # Next, we call the pack method on this widget. This tells it to size itself to fit the given text,
+            # and make itself visible.
+            panel.pack(side = "left", fill = "both", expand = "yes")
+
+            # Increment loop counter.
+            index = index + 1
+
+
+        # The window won’t appear until we’ve entered the Tkinter event loop.
+        root.mainloop()
+
+
+
+    def dealer_add_entire_hand (self) :
+        handTotal = 0
+        index = 0
+
+        while index < len(self.myHand) :
+            handTotal = handTotal+ self.myHand[index].cardValue
+            index = index + 1
+
+        # If the dealer's total is 11 or less, another while loop iterates.
+        newIndex = 0
+        if handTotal <= 11 :
+
+            # This while loop works the same as the previous one. The hand total is set to zero again before it iterates.
+            handTotal = 0
+            while newIndex< len(self.myHand) :
+                # The while loop cycles through each "card" in the hand again. If an ace pops up,
+                # it changes the ace's "cardValue" paramaeter from one to ll.
+                # NOTE: The loop it set up to only check for an ace and change its value IF the hand total will not exceed 21.
+                if self.myHand[newIndex].cardRank == "ace" :
+                    self.myHand[newIndex].cardValue = 11
+
+                # The hand total is tallied again. If the loop doesn't find an ace, the new hand total will be the same as before.
+                handTotal = handTotal+ self.myHand[newIndex].cardValue
+                newIndex = newIndex + 1
+
+
+        newIndex = 0
+        if handTotal > 21 :
+            # This while loop works the same as the previous one. The hand total is set to zero again before it iterates.
+            handTotal = 0
+            while newIndex< len(self.myHand) :
+                # The while loop cycles through each "card" in the hand again. If an ace pops up,
+                # it changes the ace's "cardValue" paramaeter from one to ll.
+                # NOTE: The loop it set up to only check for an ace and change its value IF the hand total will not exceed 21.
+                if self.myHand[newIndex].cardRank == "ace" :
+                    self.myHand[newIndex].cardValue = 1
+
+                # The hand total is tallied again. If the loop doesn't find an ace, the new hand total will be the same as before.
+                handTotal = handTotal+ self.myHand[newIndex].cardValue
+                newIndex = newIndex + 1
+                        
+                
+        # This method includes a return statememnt. Now when ever the method is called, the int value of "handTotal" is returned
+        # This allows the value to be operated on, compared, or set to a varaible when called. This works becasue the method contains
+        # no print statements. Instead, the method call itself can be printed.
+        return handTotal
+            
+
+
+# class player () :
+
+#     def __init__ (self, name, bet) :
+#         self.bet += bet
+#         newPlayerHand = playerHand()
+
+
+    
+        
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+#################################################################################################################################
+
+
+
+
+
+
+
+class Application(Frame):
+    def __init__(self, master):
+        Frame.__init__(self, master)
+        self.grid()
+        self.create_widgets()
+
+
+    def callback (self) :
+        # Second label gets the player's text entry.
+        self.midLabel = Label(self, text="Hi " + self.entryWidget.get() + ". Do you want to start?")  
+        self.midLabel.grid(row = 4, column = 0, sticky=W)
+
+        self.startButton = Button(self, text="Yes", width=10, command = self.callbackTwo)
+        self.startButton.grid(row = 4, column = 1, sticky=E)
+
+    def callbackTwo (self) :
+        root.destroy()
+        
+
+    def create_widgets(self):
+        # Changes working directory.
+        savedPath = os.getcwd()
+        os.chdir("/Users/Jesse/Documents/Python/classic-cards")
+
+        # Creates an image object "img" using PIL.
+        self.img = Image.open("blackJackTheme.jpg")
+        # Resizes imgage "img" and creates a new image object "imgResize" with the new size.
+        # imgResize = img.resize((225, 300), Image.ANTIALIAS)
+        self.img1 = ImageTk.PhotoImage(self.img)
+
+        self.panel = Label(self, image = self.img1)
+        self.panel.grid(row = 0, column = 0, columnspan = 2)
+
+
+        # Top label.
+        self.topLabel = Label(self, text = "What's your name?")
+        self.topLabel.grid(row = 1, column = 0, sticky=W)
+
+
+        
+        # Sets up the entry widget.
+        self.entryWidget = Entry(self, width = 30)
+        self.entryWidget.grid(row = 2, column = 0, sticky=W)
+               
+        # Entry widget enter button.
+        self.entryButton = Button(self, text="ENTER", width=10, command = self.callback)
+        self.entryButton.grid(row = 2, column = 1, sticky=E)
+
+root = Tk()
+root.title("Start Menue")
+# root.geometry("250x85")
+app = Application(root)
+root.mainloop()
+
+
+
+
+
+
+
+#################################################################################################################################
+
+
+
+
+
+
+
+
+class MainApplication(Frame):
+
+    # Creates a new player
+    myHand = playerHand ()
+
+    
+    # initiates the widgets
+    def __init__(self, master):
+
+        # Initiates the start menue Frame.
+        Frame.__init__(self, master)
+        # Initiates a grid in the hand widgit.
+        # self.grid()
+        # self.create_widgets()
+        # self.create_hand_widgets()
+
+    # This method runs when a name is eintered. It is trigered by the "enter" button.
+    def callback (self) :
+        # Second label gets the player's text entry.
+        self.midLabel = Label(self, text="Hi " + self.entryWidget.get() + ". Do you want to start?")  
+        self.midLabel.grid(row = 4, column = 0, sticky=W)
+
+        # This is the second callback "callbackTwo." When the "Yes" button is selected, the "callbackTwo" method runs.
+        self.startButton = Button(self, text="Yes", width=10, command = self.callbackTwo)
+        self.startButton.grid(row = 4, column = 1, sticky=E)
+
+    # Activated by the "Yes" button, it closes the widget.
+    def callbackTwo (self) :
+        root.destroy()
+        print("hi")
+
+
+
+
+
+
+
+
+
+
+
+        
+
+#    def create_widgets(self):
+#        # Changes working directory.
+#        savedPath = os.getcwd()
+#        os.chdir("/Users/Jesse/Documents/Python/classic-cards")
+#
+        
+
+
+#        # Player's label.
+#        self.topLabel = Label(self, text = "Player's Hand.")
+#        self.topLabel.grid(row = 0, column = 0, sticky=W)
+#
+#        # Dealer's label.
+#        self.topLabel = Label(self, text = "Dealer's Hand.")
+#        self.topLabel.grid(row = 0, column = 2, sticky=W)
+
+        
+#        # Sets up the entry widget.
+#        self.entryWidget = Entry(self, width = 30)
+#        self.entryWidget.grid(row = 2, column = 0, sticky=W)
+               
+#        # Entry widget enter button.
+#        self.entryButton = Button(self, text="ENTER", width=10, command = self.callback)
+#        self.entryButton.grid(row = 2, column = 1, sticky=E)
+
+
+#    def create_hand_widgets(self):
+
+#        # Changes working directory.
+#        savedPath = os.getcwd()
+#        os.chdir("/Users/Jesse/Documents/Python/classic-cards")
+#        
+#        index = 0
+#        while index < int(self.myHand.num_cards) :
+#            # print(str(self.myHand[index].cardRank) + " of " + self.myHand[index].cardSuit + " with a value of "+ str(self.myHand[index].cardValue))
+
+
+#            # Creates image objects and adds them to the list "listOfPics".
+#            savedPath = os.getcwd()
+#            os.chdir("/Users/Jesse/Documents/Python/classic-cards")
+#
+#            # Creates an image object "img" using PIL.
+#            self.img = Image.open(self.myHand.show_card_pic(index))
+#            # Resizes imgage "img" and creates a new image object "imgResize" with the new size.
+#            # imgResize = img.resize((225, 300), Image.ANTIALIAS)
+#            self.img1 = ImageTk.PhotoImage(self.img)
+#
+#            self.panel = Label(self, image = self.img1)
+#            self.panel.grid(row = 0, column = 0, columnspan = 2)
+
+
+#            index = index + 1
+
+
+        
+
+
+
+
+        
+
+root = Tk()
+root.title("Start Menue")
+# root.geometry("250x85")
+app = MainApplication(root)
+root.mainloop()
+
+
+
+
+
+
+#################################################################################################################################
+
+
+
+
+
+
+
+
+
+
+# Python script. This functions as the driver and contains the game algorithsm.
+
+
+myHand = playerHand ()
+
+
+
+
+        
+
+        
+
+playerName = input("Hi. What's your name?")
+print("Hi " + playerName + ". Let's play Black Jack!")
+print()
+
+
+print("The dealer is dealing you a card.")
+myHand.pick_a_card()
+print()
+print("The dealer is dealing you another card.")
+myHand.pick_a_card()
+
+print()
+print()
+print("Here's your hand:")
+myHand.show_entire_hand()
+print()
+print("Your total is " + str(myHand.add_entire_hand()) + ".")
+
+
+
+dealerHand = dealerHand ()
+    
+print()
+print()
+print()
+print()
+print("Now the dealer is dealt a card.")
+print("NOTE: if the dealer gets an ace, he can change its value to 1 or 11 at any time.")
+dealerHand.dealer_pick_a_card()
+print("The dealer is dealt another card.")
+dealerHand.dealer_pick_a_card()
+print()
+print("The dealer's hand is:")
+dealerHand.dealer_show_entire_hand()
+print()
+print("The dealer's total is " + str(dealerHand.dealer_add_entire_hand()) + ".")
+
+
+
+playerInput = "hit me"
+playerIndex = 0
+dealerIndex = 0
+condition = "no"
+dealerStatus = "go"
+
+
+
+
+
+
+
+
+
+
+while condition == "no" :
+
+    if playerInput == "hit me" :
+        print()
+        print()
+        print()
+        print()
+        print("Your total is " + str(myHand.add_entire_hand()) + ".")
+        playerInput = input('Enter "hit me" to get a card and "stay" to check.')
+
+    if playerInput == "hit me" :
+        print()
+        print('You said "hit me".' + " Here's a card.")
+        myHand.pick_a_card()
+        print()
+        print("Now, here's your hand:")
+        myHand.show_entire_hand()
+        print()
+        print("Your total is " + str(myHand.add_entire_hand()) + ".")
+        
+
+    if playerInput == "stay" :
+        while playerIndex == 0 :
+            
+            print()
+            print('You said "stay".')
+            print("Your total is " + str(myHand.add_entire_hand()) + ".")
+            playerIndex = playerIndex + 1
+
+
+    
+    if dealerHand.dealer_add_entire_hand() in range (17, 21) and myHand.add_entire_hand() < 21 :
+        while dealerIndex == 0 :
+        
+            print()
+            print()
+            print()
+            print()
+            print("Now it's the dealer's turn.")
+            print("The dealer checks. Here's his hand:")
+            dealerHand.dealer_show_entire_hand()
+            print("The dealer's total is " + str(dealerHand.dealer_add_entire_hand()) + ".")
+            dealerIndex = dealerIndex + 1
+            dealerStatus = "check"
+        
+    
+    if dealerHand.dealer_add_entire_hand() < 17 and myHand.add_entire_hand() < 21 :
+        print()
+        print()
+        print()
+        print()
+        print("Now it's the dealer's turn.")
+        dealerHand.dealer_pick_a_card()
+        print()
+        print("Now his hand is:")
+        dealerHand.dealer_show_entire_hand()
+        print()
+        print("The dealer's total is:")
+        print(dealerHand.dealer_add_entire_hand())
+    
+    
+    
+    
+
+
+
+
+    if myHand.add_entire_hand() == 21 : # and dealerStatus == "check":
+        print()
+        print("You got 21! You win!")
+        condition = "yes"
+    
+    
+    if dealerHand.dealer_add_entire_hand() == 21 :
+        print()
+        print("The dealer got 21! You lose!")
+        condition = "yes"
+
+    # If you go over 21, you lose
+    if myHand.add_entire_hand() > 21 :
+        print('\n')
+        print("You lose! You went over!")
+        condition = "yes"
+     
+    # If the dealer goes over 21, you win.  The condition to see if the dealer checked is not used here.
+    # This is becasue we want this statement to interate if the dealer goes over 21 before he is able to check.
+    if dealerHand.dealer_add_entire_hand() >21 and myHand.add_entire_hand() <=21 :
+        print('\n')
+        print("You win! The dealer went over.")
+        condition = "yes"
+
+
+    # If you both go over 21, it's a bust
+    if dealerHand.dealer_add_entire_hand() > 21 and myHand.add_entire_hand() > 21 and myHand.add_entire_hand() and dealerStatus == "check" :
+        print('\n')
+        print("It's a bust!")
+        condition = "yes"
+    
+
+    # If the dealer is over 17 and you have less than 21 and it's a tie.
+    # There is a flaw here because it can end the game before you want to.
+    if dealerHand.dealer_add_entire_hand() in range(17, 21) and myHand.add_entire_hand() <= 21 and myHand.add_entire_hand() == dealerHand.dealer_add_entire_hand() and playerInput == 'stay' and dealerStatus == "check" :
+        print('\n')
+        print("It's a tie!")
+        condition = "yes"
+ 
+
+    # If the dealer has a total of 17-21 (the dealer checked), you have under 21, you checked,
+    # and the dealer is closer to 21 than you, you lose.
+    if dealerHand.dealer_add_entire_hand() in range(17, 21) and myHand.add_entire_hand() <= 21 and dealerHand.dealer_add_entire_hand() > myHand.add_entire_hand() and playerInput == 'stay' and dealerStatus == "check" :
+        print('\n')
+        print ("The dealer is closer to 21! You lose!")
+        condition = "yes"
+ 
+
+    # If the dealer has a total of 17-21, you have under 21, you checked,
+    # and you are closer than 21 than the dealer, you win.        
+    if dealerHand.dealer_add_entire_hand() in range(17, 21) and myHand.add_entire_hand() <= 21 and dealerHand.dealer_add_entire_hand() < myHand.add_entire_hand() and playerInput == 'stay' and dealerStatus == "check" :
+        print('\n')
+        print ("You're closer to 21! You Win!")
+        condition = "yes"
+
+
+
